@@ -115,12 +115,6 @@
                         <input type="text" id="searchName" placeholder="Filtrar por nombre..." class="pl-9 w-full md:w-64 bg-white border border-slate-200 rounded-lg py-2 px-4 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm" onkeyup="renderApp()">
                     </div>
                     
-                    <!-- Select adicional para categorías nuevas si no caben en dots -->
-                    <select id="filterField" class="hidden md:block bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderApp()">
-                        <option value="all">Categoría...</option>
-                        <option value="consejero_fundacion">Fundación</option>
-                    </select>
-
                     <button onclick="resetFilters()" class="text-xs font-bold text-slate-400 hover:text-red-500 transition px-3 py-2 rounded border border-transparent hover:border-slate-200">
                         <i class="fa-solid fa-rotate-left mr-1"></i> RESET
                     </button>
@@ -237,7 +231,7 @@
     <div id="notification-container" class="fixed bottom-6 right-6 z-[110] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // --- DATA MODEL ---
+        // --- DATA MODEL (12 CANDIDATOS) ---
         const defaultData = [
             {
                 id: 1,
@@ -300,6 +294,118 @@
                     "extranjero": [{ inicio: 2010, fin: 2018 }],
                     "consejero_familiar": [{ inicio: 2020, fin: null }]
                 }
+            },
+            {
+                id: 5,
+                nombre: "Sofia Valdés",
+                foto: "https://randomuser.me/api/portraits/women/33.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Derecho", "Máster en Fiscalidad"],
+                cargos: ["Socia Directora Valdés & Asociados", "Secretaria Consejo Grupo S.A."],
+                experiencia: {
+                    "legal": [{ inicio: 2000, fin: null }],
+                    "consejero_familiar": [{ inicio: 2012, fin: null }],
+                    "consejero_privada": [{ inicio: 2018, fin: null }],
+                    "gerencia": [{ inicio: 2010, fin: null }]
+                }
+            },
+            {
+                id: 6,
+                nombre: "Miguel Ángel Torres",
+                foto: "https://randomuser.me/api/portraits/men/22.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Ingeniero Industrial", "PDG IESE"],
+                cargos: ["Director General Energía Solar SL", "Consejero Asesor Startup Tech"],
+                experiencia: {
+                    "energia": [{ inicio: 1998, fin: null }],
+                    "gerencia": [{ inicio: 2005, fin: null }],
+                    "sostenibilidad": [{ inicio: 2015, fin: null }],
+                    "extranjero": [{ inicio: 2000, fin: 2008 }]
+                }
+            },
+            {
+                id: 7,
+                nombre: "Laura Prieto",
+                foto: "https://randomuser.me/api/portraits/women/90.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Ingeniera Informática", "CISO Certified"],
+                cargos: ["CISO Global Bank", "Consejera Indep. TechCorp"],
+                experiencia: {
+                    "ciberseguridad": [{ inicio: 2008, fin: null }],
+                    "banca": [{ inicio: 2012, fin: null }],
+                    "inteligencia_artificial": [{ inicio: 2018, fin: null }],
+                    "consejero_privada": [{ inicio: 2021, fin: null }]
+                }
+            },
+            {
+                id: 8,
+                nombre: "Roberto Gil",
+                foto: "https://randomuser.me/api/portraits/men/54.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["ADE", "MBA Wharton"],
+                cargos: ["CEO Retail Group", "Patrón Fundación Social"],
+                experiencia: {
+                    "gerencia": [{ inicio: 2000, fin: null }],
+                    "finanzas": [{ inicio: 1995, fin: 2005 }],
+                    "extranjero": [{ inicio: 2005, fin: 2015 }],
+                    "consejero_fundacion": [{ inicio: 2010, fin: null }]
+                }
+            },
+            {
+                id: 9,
+                nombre: "Carmen Ortiz",
+                foto: "https://randomuser.me/api/portraits/women/12.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Química", "Doctorado Medioambiente"],
+                cargos: ["Directora Sostenibilidad IBEX35", "Consejera Consultiva UE"],
+                experiencia: {
+                    "sostenibilidad": [{ inicio: 2005, fin: null }],
+                    "energia": [{ inicio: 2010, fin: null }],
+                    "consejero_publica": [{ inicio: 2015, fin: 2020 }],
+                    "gerencia": [{ inicio: 2012, fin: null }]
+                }
+            },
+            {
+                id: 10,
+                nombre: "Fernando López",
+                foto: "https://randomuser.me/api/portraits/men/76.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Ingeniero Caminos", "Máster Project Finance"],
+                cargos: ["Presidente Infraestructuras SA", "Consejero Banco Desarrollo"],
+                experiencia: {
+                    "gerencia": [{ inicio: 1995, fin: null }],
+                    "finanzas": [{ inicio: 2000, fin: 2010 }],
+                    "consejero_privada": [{ inicio: 2005, fin: null }],
+                    "extranjero": [{ inicio: 1990, fin: 2000 }]
+                }
+            },
+            {
+                id: 11,
+                nombre: "Patricia Gómez",
+                foto: "https://randomuser.me/api/portraits/women/55.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Derecho", "MBA IE"],
+                cargos: ["Secretaria General Corporativa", "Consejera Familiar Grupo G"],
+                experiencia: {
+                    "legal": [{ inicio: 2005, fin: null }],
+                    "consejero_familiar": [{ inicio: 2015, fin: null }],
+                    "gerencia": [{ inicio: 2010, fin: null }],
+                    "finanzas": [{ inicio: 2018, fin: null }]
+                }
+            },
+            {
+                id: 12,
+                nombre: "Alberto Sánchez",
+                foto: "https://randomuser.me/api/portraits/men/11.jpg",
+                linkedin: "https://linkedin.com",
+                titulacion: ["Físico", "Experto en Datos"],
+                cargos: ["CDO Tech Solutions", "Advisor AI Ethics"],
+                experiencia: {
+                    "inteligencia_artificial": [{ inicio: 2010, fin: null }],
+                    "ciberseguridad": [{ inicio: 2015, fin: null }],
+                    "gerencia": [{ inicio: 2018, fin: null }],
+                    "banca": [{ inicio: 2012, fin: 2018 }]
+                }
             }
         ];
 
@@ -325,11 +431,11 @@
 
         function getDegreeStyle(title) {
             const t = title.toLowerCase();
-            if (t.includes('ingenier') || t.includes('telecom') || t.includes('caminos') || t.includes('industrial') || t.includes('informát')) return { icon: "fa-gears", css: "bg-blue-50 text-blue-700 border-blue-100" };
-            if (t.includes('mba') || t.includes('ade') || t.includes('business') || t.includes('pade') || t.includes('dirección')) return { icon: "fa-user-tie", css: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+            if (t.includes('ingenier') || t.includes('telecom') || t.includes('caminos') || t.includes('industrial') || t.includes('informát') || t.includes('química') || t.includes('físic')) return { icon: "fa-gears", css: "bg-blue-50 text-blue-700 border-blue-100" };
+            if (t.includes('mba') || t.includes('ade') || t.includes('business') || t.includes('pade') || t.includes('pdg') || t.includes('dirección')) return { icon: "fa-user-tie", css: "bg-emerald-50 text-emerald-700 border-emerald-100" };
             if (t.includes('econom') || t.includes('financ') || t.includes('cfa')) return { icon: "fa-chart-pie", css: "bg-amber-50 text-amber-700 border-amber-100" };
-            if (t.includes('derecho') || t.includes('leyes') || t.includes('jurídic') || t.includes('abogad')) return { icon: "fa-scale-balanced", css: "bg-red-50 text-red-700 border-red-100" };
-            if (t.includes('phd') || t.includes('doctor') || t.includes('ciencias') || t.includes('física')) return { icon: "fa-microscope", css: "bg-violet-50 text-violet-700 border-violet-100" };
+            if (t.includes('derecho') || t.includes('leyes') || t.includes('jurídic') || t.includes('abogad') || t.includes('fiscal')) return { icon: "fa-scale-balanced", css: "bg-red-50 text-red-700 border-red-100" };
+            if (t.includes('phd') || t.includes('doctor') || t.includes('ciencias')) return { icon: "fa-microscope", css: "bg-violet-50 text-violet-700 border-violet-100" };
             return { icon: "fa-graduation-cap", css: "bg-slate-100 text-slate-600 border-slate-200" };
         }
 
@@ -463,8 +569,7 @@
             
             container.innerHTML = '';
             const searchTerm = document.getElementById('searchName').value.toLowerCase();
-            const filterField = document.getElementById('filterField').value; // Filtro select adicional
-
+            
             let visibleCount = 0;
 
             alumnos.forEach(alumno => {
@@ -474,12 +579,6 @@
                 
                 if (!nameMatch) return;
                 
-                // Filtro Select Adicional (si se usa)
-                if (filterField !== 'all') {
-                    const y = alumno.experiencia[filterField] ? calculateTotalYears(alumno.experiencia[filterField]) : 0;
-                    if (y === 0) return;
-                }
-
                 // Filtro Puntos
                 let passFilters = true;
                 for (const [key, reqLevel] of Object.entries(activeFilters)) {
@@ -583,7 +682,6 @@
 
         // --- UI UTILS ---
         
-        // ... (Funciones de toggle, reset, modals igual que antes)
         function toggleEditMode() {
             isEditMode = !isEditMode;
             const btn = document.getElementById('btn-mode');
@@ -604,7 +702,7 @@
 
         function resetFilters() {
             document.getElementById('searchName').value = '';
-            document.getElementById('filterField').value = 'all';
+            // El filtro de campo ya no existe, eliminada la referencia
             activeFilters = {}; 
             renderApp();
         }
