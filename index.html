@@ -11,24 +11,14 @@
     
     <style>
         /* Estilos personalizados */
-        .exp-bar-bg {
-            background-color: #f1f5f9;
-            height: 5px;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 3px;
-        }
-        .exp-bar-fill {
-            height: 100%;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
         .card-hover {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
+        
         /* Animación para notificaciones */
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -37,44 +27,65 @@
         .notification {
             animation: slideIn 0.3s ease-out forwards;
         }
-        textarea::-webkit-scrollbar {
-            width: 8px;
+
+        /* Estilos de los puntos (Dots) */
+        .dot {
+            height: 6px;
+            border-radius: 2px;
+            flex: 1;
+            transition: all 0.2s ease;
         }
-        textarea::-webkit-scrollbar-track {
-            background: #f1f1f1; 
+        .dot-active {
+            opacity: 1;
         }
-        textarea::-webkit-scrollbar-thumb {
-            background: #888; 
-            border-radius: 4px;
+        .dot-inactive {
+            background-color: #e2e8f0; /* Slate 200 */
+        }
+        /* Hover effects for interactive search card */
+        .dot-interactive:hover {
+            transform: scaleY(1.5);
+            cursor: pointer;
+        }
+        
+        /* Scrollbar personalizada */
+        textarea::-webkit-scrollbar { width: 6px; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        /* Utilidad para limitar líneas de texto */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <nav class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-40">
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md backdrop-blur-md bg-opacity-95">
         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center">
-                <div class="bg-white text-blue-900 p-2 rounded-lg mr-3">
-                    <i class="fa-solid fa-users-viewfinder text-xl"></i>
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white w-10 h-10 flex items-center justify-center rounded-lg shadow-lg">
+                    <i class="fa-solid fa-users-viewfinder text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wider leading-none">CONSEJEROS</h1>
-                    <span class="text-xs text-blue-200 tracking-widest">COIIM / BOLSA DE TALENTO</span>
+                    <h1 class="text-lg font-bold tracking-wide leading-none">CONSEJEROS</h1>
+                    <span class="text-[10px] text-slate-400 tracking-[0.2em] uppercase">Bolsa de Talento COIIM</span>
                 </div>
             </div>
             
             <div class="flex flex-wrap justify-center gap-3">
-                <button onclick="toggleEditMode()" id="btn-mode" class="bg-blue-800 hover:bg-blue-700 border border-blue-700 px-4 py-2 rounded shadow-sm transition text-sm flex items-center">
+                <button onclick="toggleEditMode()" id="btn-mode" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg shadow-sm transition text-xs font-medium uppercase tracking-wider flex items-center">
                     <i class="fa-solid fa-pen-to-square mr-2"></i> Modo Edición
                 </button>
                 
                 <div id="file-actions" class="hidden flex gap-2">
-                    <button onclick="exportData()" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded shadow-sm transition text-sm flex items-center">
-                        <i class="fa-solid fa-download mr-2"></i> Guardar JSON
+                    <button onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg shadow-sm transition text-xs font-medium flex items-center">
+                        <i class="fa-solid fa-download mr-2"></i> Guardar
                     </button>
-                    <label class="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded shadow-sm transition text-sm flex items-center cursor-pointer">
-                        <i class="fa-solid fa-upload mr-2"></i> Cargar JSON
+                    <label class="bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-lg shadow-sm transition text-xs font-medium flex items-center cursor-pointer">
+                        <i class="fa-solid fa-upload mr-2"></i> Cargar
                         <input type="file" id="file-input" class="hidden" accept=".json" onchange="importData(this)">
                     </label>
                 </div>
@@ -82,193 +93,194 @@
         </div>
     </nav>
 
-    <!-- Filtros -->
-    <div class="container mx-auto mt-6 px-4">
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
-                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wide"><i class="fa-solid fa-filter mr-2"></i>Filtros de Búsqueda</h2>
-                <span id="results-count" class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">3 candidatos</span>
+    <!-- Ficha de Búsqueda Interactiva -->
+    <div class="container mx-auto mt-8 px-4">
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <!-- Header Búsqueda -->
+            <div class="bg-slate-50 border-b border-slate-100 p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="bg-blue-100 text-blue-700 p-2 rounded-lg">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Configurar Búsqueda</h2>
+                        <p class="text-xs text-slate-400">Marca los puntos para exigir experiencia mínima</p>
+                    </div>
+                </div>
+                
+                <!-- Buscador Texto y Reset -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <div class="relative group flex-grow md:flex-grow-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="searchName" placeholder="Filtrar por nombre..." class="pl-9 w-full md:w-64 bg-white border border-slate-200 rounded-lg py-2 px-4 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm" onkeyup="renderApp()">
+                    </div>
+                    
+                    <!-- Select adicional para categorías nuevas si no caben en dots -->
+                    <select id="filterField" class="hidden md:block bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="renderApp()">
+                        <option value="all">Categoría...</option>
+                        <option value="consejero_fundacion">Fundación</option>
+                    </select>
+
+                    <button onclick="resetFilters()" class="text-xs font-bold text-slate-400 hover:text-red-500 transition px-3 py-2 rounded border border-transparent hover:border-slate-200">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> RESET
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel de Puntos Interactivos -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6" id="search-filters-container">
+                <!-- Se rellena dinámicamente con JS -->
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <div class="md:col-span-5">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Nombre o Apellidos</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-                        <input type="text" id="searchName" placeholder="Ej: Ana García..." class="pl-10 border border-slate-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:outline-none transition" onkeyup="renderApp()">
-                    </div>
-                </div>
-                
-                <div class="md:col-span-4">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Filtro Avanzado</label>
-                    <select id="filterField" class="border border-slate-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white transition" onchange="renderApp()">
-                        <option value="all">Todas las especialidades</option>
-                        
-                        <optgroup label="Experiencia Laboral">
-                            <option value="gerencia">Alta Gerencia</option>
-                            <option value="extranjero">Exp. Internacional</option>
-                        </optgroup>
-                        
-                        <optgroup label="Consejos de Administración">
-                            <option value="consejero_publica">Empresa Pública</option>
-                            <option value="consejero_privada">Empresa Privada</option>
-                            <option value="consejero_familiar">Empresa Familiar</option>
-                        </optgroup>
-                        
-                        <optgroup label="Áreas de Expertise">
-                            <option value="inteligencia_artificial">IA / Tech</option>
-                            <option value="finanzas">Finanzas</option>
-                            <option value="legal">Legal / Regulatorio</option>
-                            <option value="ciberseguridad">Ciberseguridad</option>
-                            <option value="sostenibilidad">Sostenibilidad (ESG)</option>
-                            <option value="energia">Energía</option>
-                            <option value="banca">Banca</option>
-                        </optgroup>
-                    </select>
-                </div>
-                
-                <div class="md:col-span-3">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Mínimo Años</label>
-                    <div class="flex items-center">
-                        <input type="number" id="minYears" value="0" min="0" max="50" class="border border-slate-300 p-2 rounded w-20 focus:ring-2 focus:ring-blue-500 focus:outline-none transition mr-2" onchange="renderApp()">
-                        <span class="text-sm text-slate-600">años</span>
-                    </div>
-                </div>
+            <!-- Barra de Resultados -->
+            <div class="bg-blue-900 text-white text-xs font-bold py-2 px-4 text-center tracking-wider" id="results-bar">
+                MOSTRANDO RESULTADOS
             </div>
         </div>
     </div>
 
     <!-- Grid de Tarjetas -->
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Las tarjetas se generan dinámicamente -->
+    <main class="flex-grow container mx-auto px-4 py-10">
+        <div id="cards-container" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+            <!-- Renderizado dinámico -->
         </div>
         
         <!-- Estado vacío -->
-        <div id="empty-state" class="hidden text-center py-20">
-            <div class="bg-slate-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-user-slash text-3xl text-slate-400"></i>
+        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="bg-white p-6 rounded-full shadow-sm mb-4">
+                <i class="fa-solid fa-filter-circle-xmark text-4xl text-slate-300"></i>
             </div>
-            <h3 class="text-xl font-bold text-slate-700">No se encontraron consejeros</h3>
-            <p class="text-slate-500 mt-2">Intenta ajustar los filtros de búsqueda.</p>
-            <button onclick="resetFilters()" class="mt-4 text-blue-600 hover:underline font-medium">Limpiar filtros</button>
+            <h3 class="text-xl font-bold text-slate-700">Sin coincidencias</h3>
+            <p class="text-slate-500 mt-2 text-sm max-w-md mx-auto">Ningún candidato cumple con todos los criterios de experiencia marcados.</p>
+            <button onclick="resetFilters()" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium shadow-lg shadow-blue-200">
+                Limpiar Filtros
+            </button>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm mt-auto">
-        <p>© 2024 Colegio Oficial de Ingenieros Industriales de Madrid</p>
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="container mx-auto px-4 py-8 text-center">
+            <p class="text-slate-400 text-sm font-medium">© 2024 Colegio Oficial de Ingenieros Industriales de Madrid</p>
+        </div>
     </footer>
 
     <!-- Modal de Edición -->
-    <div id="edit-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modal-content">
-            <!-- Modal Header -->
-            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
-                <h2 class="text-lg font-bold flex items-center">
-                    <i class="fa-solid fa-user-pen mr-2"></i> Editar Consejero
+    <div id="edit-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="modal-content">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-blue-600"></i> Editar Ficha
                 </h2>
-                <button onclick="closeModal()" class="text-blue-300 hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Modal Body -->
-            <div class="p-6 overflow-y-auto">
-                <form id="edit-form" class="space-y-5">
+            <div class="p-8 overflow-y-auto space-y-6">
+                <form id="edit-form">
                     <input type="hidden" id="edit-id">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="edit-nombre" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    <div class="flex gap-6 items-start">
+                        <div class="w-1/3">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Foto de Perfil</label>
+                            <div class="relative group">
+                                <img id="preview-foto" src="" class="w-full aspect-square rounded-xl object-cover bg-slate-100 mb-2 border border-slate-200">
+                                <input type="text" id="edit-foto" class="w-full text-xs border border-slate-200 rounded p-2 text-slate-500 focus:border-blue-500 outline-none" placeholder="URL de la imagen" onchange="document.getElementById('preview-foto').src = this.value">
+                            </div>
                         </div>
-                         <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">URL Foto</label>
-                            <input type="text" id="edit-foto" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none transition text-xs">
+                        <div class="w-2/3 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nombre y Apellidos</label>
+                                <input type="text" id="edit-nombre" class="w-full text-lg font-bold border-b-2 border-slate-100 focus:border-blue-500 outline-none py-1 bg-transparent transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Perfil LinkedIn (URL)</label>
+                                <input type="text" id="edit-linkedin" class="w-full text-sm border border-slate-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-50 outline-none transition" placeholder="https://linkedin.com/in/usuario">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Cargos (separar por comas)</label>
+                                <input type="text" id="edit-cargos" class="w-full text-sm border border-slate-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-50 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Titulaciones</label>
+                                <input type="text" id="edit-titulacion" class="w-full text-sm border border-slate-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-50 outline-none transition">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cargos Actuales (separados por coma)</label>
-                        <input type="text" id="edit-cargos" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
                     </div>
 
-                    <div>
-                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Titulaciones (separadas por coma)</label>
-                        <input type="text" id="edit-titulacion" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded focus:ring-2 focus:ring-blue-500 outline-none transition">
-                    </div>
-
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-xs font-bold text-blue-800 uppercase">
-                                <i class="fa-solid fa-code mr-1"></i> Datos de Experiencia (JSON)
-                            </label>
-                            <span class="text-[10px] bg-blue-200 text-blue-800 px-2 py-0.5 rounded">Formato Avanzado</span>
+                    <div class="mt-6 pt-6 border-t border-slate-100">
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="text-xs font-bold text-slate-400 uppercase">Matriz de Experiencia (JSON)</label>
+                            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded border border-slate-200 font-mono">Formato Técnico</span>
                         </div>
-                        <p class="text-xs text-blue-600 mb-2 leading-relaxed">
-                            Edita los periodos. Usa <code>null</code> en "fin" para indicar que el cargo continúa actualmente (se calcularán los años automáticamente).
-                        </p>
-                        <textarea id="edit-experiencia" rows="8" class="w-full border border-blue-200 p-3 rounded font-mono text-xs text-slate-700 bg-white focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        <div class="relative">
+                            <textarea id="edit-experiencia" rows="6" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-xs text-slate-600 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition leading-relaxed"></textarea>
+                            <div class="absolute bottom-4 right-4 text-[10px] text-slate-400 bg-white/80 px-2 py-1 rounded backdrop-blur">
+                                Usa <code class="text-pink-500 font-bold">null</code> para cargos actuales.
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
-                <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-slate-600 hover:text-slate-800 hover:bg-slate-200 rounded font-medium transition">Cancelar</button>
-                <button type="button" onclick="saveEdits()" class="px-5 py-2.5 bg-blue-900 text-white rounded shadow-md hover:bg-blue-800 transform hover:-translate-y-0.5 transition font-medium">
-                    <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar Cambios
+            <div class="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition">Cancelar</button>
+                <button type="button" onclick="saveEdits()" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition">
+                    Guardar Cambios
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Contenedor de Notificaciones -->
-    <div id="notification-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+    <!-- Notificaciones -->
+    <div id="notification-container" class="fixed bottom-6 right-6 z-[110] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // --- 1. DATOS INICIALES ---
+        // --- DATA MODEL ---
         const defaultData = [
             {
                 id: 1,
                 nombre: "Ana García Pérez",
                 foto: "https://randomuser.me/api/portraits/women/44.jpg",
-                genero: "M",
+                linkedin: "https://linkedin.com",
                 titulacion: ["Ingeniera Industrial", "MBA IESE"],
-                cargos: ["Consejera Indep. Red Eléctrica", "CEO GreenTech"],
+                cargos: ["Consejera Red Eléctrica", "CEO GreenTech"],
                 experiencia: {
+                    "gerencia": [{ inicio: 2010, fin: null }],
                     "energia": [{ inicio: 2005, fin: 2015 }, { inicio: 2018, fin: null }],
                     "finanzas": [{ inicio: 2010, fin: 2015 }],
                     "sostenibilidad": [{ inicio: 2015, fin: null }],
                     "consejero_publica": [{ inicio: 2020, fin: null }],
-                    "consejero_privada": [{ inicio: 2018, fin: null }]
+                    "consejero_privada": [{ inicio: 2018, fin: null }],
+                    "consejero_fundacion": [{ inicio: 2021, fin: null }]
                 }
             },
             {
                 id: 2,
                 nombre: "Carlos Ruiz de la Torre",
                 foto: "https://randomuser.me/api/portraits/men/32.jpg",
-                genero: "H",
-                titulacion: ["Ingeniero de Telecomunicación", "PhD IA"],
+                linkedin: "https://linkedin.com",
+                titulacion: ["Ingeniero Telecomunicación", "PhD IA"],
                 cargos: ["CTO Banco Futuro", "Patrón Fundación Innovación"],
                 experiencia: {
+                    "gerencia": [{ inicio: 2015, fin: null }],
                     "banca": [{ inicio: 2010, fin: null }],
                     "inteligencia_artificial": [{ inicio: 2000, fin: 2010 }, { inicio: 2015, fin: null }],
                     "ciberseguridad": [{ inicio: 2018, fin: null }],
-                    "gerencia": [{ inicio: 2015, fin: null }]
+                    "consejero_fundacion": [{ inicio: 2019, fin: null }]
                 }
             },
             {
                 id: 3,
                 nombre: "Elena M. Strogonoff",
                 foto: "https://randomuser.me/api/portraits/women/68.jpg",
-                genero: "M",
+                linkedin: "https://linkedin.com",
                 titulacion: ["Ingeniera de Caminos", "PADE", "Derecho"],
                 cargos: ["Consejera Constructora S.A."],
                 experiencia: {
-                    "extranjero": [{ inicio: 1998, fin: 2010 }],
                     "gerencia": [{ inicio: 2005, fin: null }],
+                    "extranjero": [{ inicio: 1998, fin: 2010 }],
                     "consejero_privada": [{ inicio: 2015, fin: null }],
                     "consejero_familiar": [{ inicio: 2010, fin: 2015 }],
                     "legal": [{ inicio: 2000, fin: 2005 }]
@@ -278,14 +290,14 @@
                 id: 4,
                 nombre: "Javier Méndez",
                 foto: "https://randomuser.me/api/portraits/men/85.jpg",
-                genero: "H",
+                linkedin: "https://linkedin.com",
                 titulacion: ["Economista", "CFA", "Máster Finanzas"],
-                cargos: ["CFO Global Motors", "Advisor Fintech Startup"],
+                cargos: ["CFO Global Motors", "Advisor Fintech"],
                 experiencia: {
+                    "gerencia": [{ inicio: 2018, fin: null }],
                     "finanzas": [{ inicio: 1995, fin: null }],
                     "banca": [{ inicio: 2000, fin: 2010 }],
                     "extranjero": [{ inicio: 2010, fin: 2018 }],
-                    "gerencia": [{ inicio: 2018, fin: null }],
                     "consejero_familiar": [{ inicio: 2020, fin: null }]
                 }
             }
@@ -293,248 +305,307 @@
 
         let alumnos = [...defaultData];
         let isEditMode = false;
+        let activeFilters = {};
 
-        // --- 2. LÓGICA DE CÁLCULO (Motor) ---
+        // --- CORE LOGIC ---
 
         function calculateTotalYears(periods) {
             if (!periods) return 0;
-            let totalDays = 0;
+            let totalMilliseconds = 0;
             const now = new Date();
-
             periods.forEach(p => {
                 const start = new Date(p.inicio, 0, 1);
                 const end = p.fin ? new Date(p.fin, 11, 31) : now;
                 if (start > now) return;
                 const diffTime = Math.max(0, end - start);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                totalDays += diffDays;
+                totalMilliseconds += diffTime;
             });
-
-            return Math.floor(totalDays / 365);
+            return Math.floor(totalMilliseconds / (1000 * 60 * 60 * 24 * 365));
         }
 
-        // --- 3. ESTILOS DE TITULACIONES ---
-        
         function getDegreeStyle(title) {
             const t = title.toLowerCase();
-            
-            if (t.includes('ingenier') || t.includes('telecom') || t.includes('caminos') || t.includes('industrial') || t.includes('informát')) {
-                return { icon: "fa-gears", css: "bg-blue-50 text-blue-700 border-blue-200" };
-            }
-            if (t.includes('mba') || t.includes('ade') || t.includes('business') || t.includes('pade') || t.includes('dirección')) {
-                return { icon: "fa-user-tie", css: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-            }
-            if (t.includes('econom') || t.includes('financ') || t.includes('cfa')) {
-                return { icon: "fa-chart-pie", css: "bg-amber-50 text-amber-700 border-amber-200" };
-            }
-            if (t.includes('derecho') || t.includes('leyes') || t.includes('jurídic') || t.includes('abogad')) {
-                return { icon: "fa-scale-balanced", css: "bg-red-50 text-red-700 border-red-200" };
-            }
-            if (t.includes('phd') || t.includes('doctor') || t.includes('ciencias') || t.includes('física')) {
-                return { icon: "fa-microscope", css: "bg-violet-50 text-violet-700 border-violet-200" };
-            }
-            return { icon: "fa-graduation-cap", css: "bg-slate-50 text-slate-600 border-slate-200" };
+            if (t.includes('ingenier') || t.includes('telecom') || t.includes('caminos') || t.includes('industrial') || t.includes('informát')) return { icon: "fa-gears", css: "bg-blue-50 text-blue-700 border-blue-100" };
+            if (t.includes('mba') || t.includes('ade') || t.includes('business') || t.includes('pade') || t.includes('dirección')) return { icon: "fa-user-tie", css: "bg-emerald-50 text-emerald-700 border-emerald-100" };
+            if (t.includes('econom') || t.includes('financ') || t.includes('cfa')) return { icon: "fa-chart-pie", css: "bg-amber-50 text-amber-700 border-amber-100" };
+            if (t.includes('derecho') || t.includes('leyes') || t.includes('jurídic') || t.includes('abogad')) return { icon: "fa-scale-balanced", css: "bg-red-50 text-red-700 border-red-100" };
+            if (t.includes('phd') || t.includes('doctor') || t.includes('ciencias') || t.includes('física')) return { icon: "fa-microscope", css: "bg-violet-50 text-violet-700 border-violet-100" };
+            return { icon: "fa-graduation-cap", css: "bg-slate-100 text-slate-600 border-slate-200" };
         }
 
-        // --- 4. CONFIGURACIÓN VISUAL SKILLS ---
-        
-        // Estructura de Grupos para renderizado
-        const skillGroups = [
-            {
-                title: "Experiencia Laboral",
-                keys: ["gerencia", "extranjero"]
-            },
-            {
-                title: "Experiencia en Consejos",
-                keys: ["consejero_publica", "consejero_privada", "consejero_familiar"]
-            },
-            {
-                title: "Áreas de Expertise",
-                keys: ["inteligencia_artificial", "finanzas", "legal", "ciberseguridad", "sostenibilidad", "energia", "banca"]
-            }
-        ];
-
-        // Diccionario visual de skills (Añadido 'legal' y 'consejero_familiar')
+        // Definición de skills
         const skillConfig = {
-            "gerencia": { icon: "fa-briefcase", color: "bg-blue-800", text: "text-blue-800", label: "Alta Gerencia" },
-            "extranjero": { icon: "fa-globe", color: "bg-cyan-500", text: "text-cyan-700", label: "Exp. Internac." },
+            "gerencia": { icon: "fa-briefcase", color: "bg-slate-700", text: "text-slate-700", label: "Alta Dirección" },
+            "extranjero": { icon: "fa-globe", color: "bg-cyan-500", text: "text-cyan-700", label: "Internacional" },
             
-            "consejero_publica": { icon: "fa-landmark", color: "bg-orange-600", text: "text-orange-700", label: "Cons. Público" },
-            "consejero_privada": { icon: "fa-building", color: "bg-indigo-600", text: "text-indigo-700", label: "Cons. Privado" },
-            "consejero_familiar": { icon: "fa-people-roof", color: "bg-rose-500", text: "text-rose-700", label: "Cons. Familiar" },
+            "consejero_publica": { icon: "fa-landmark", color: "bg-blue-600", text: "text-blue-700", label: "E. Pública" },
+            "consejero_privada": { icon: "fa-building", color: "bg-indigo-600", text: "text-indigo-700", label: "E. Privada" },
+            "consejero_familiar": { icon: "fa-people-roof", color: "bg-pink-500", text: "text-pink-700", label: "E. Familiar" },
+            "consejero_fundacion": { icon: "fa-hand-holding-heart", color: "bg-teal-500", text: "text-teal-700", label: "Fundación" },
             
-            "inteligencia_artificial": { icon: "fa-brain", color: "bg-violet-600", text: "text-violet-700", label: "IA / Tech" },
-            "finanzas": { icon: "fa-chart-line", color: "bg-emerald-600", text: "text-emerald-700", label: "Finanzas" },
-            "legal": { icon: "fa-scale-balanced", color: "bg-stone-600", text: "text-stone-700", label: "Legal" },
-            "ciberseguridad": { icon: "fa-shield-halved", color: "bg-red-600", text: "text-red-700", label: "Ciberseguridad" },
-            "sostenibilidad": { icon: "fa-leaf", color: "bg-lime-500", text: "text-lime-700", label: "ESG" },
             "energia": { icon: "fa-bolt", color: "bg-amber-500", text: "text-amber-700", label: "Energía" },
-            "banca": { icon: "fa-building-columns", color: "bg-slate-600", text: "text-slate-700", label: "Banca" }
+            "finanzas": { icon: "fa-chart-line", color: "bg-emerald-500", text: "text-emerald-700", label: "Finanzas" },
+            "legal": { icon: "fa-scale-balanced", color: "bg-stone-500", text: "text-stone-700", label: "Legal" },
+            "ciberseguridad": { icon: "fa-shield-halved", color: "bg-red-500", text: "text-red-700", label: "Ciberseg." },
+            "sostenibilidad": { icon: "fa-leaf", color: "bg-lime-500", text: "text-lime-700", label: "ESG" },
+            "banca": { icon: "fa-building-columns", color: "bg-blue-400", text: "text-blue-600", label: "Banca" },
+            "inteligencia_artificial": { icon: "fa-brain", color: "bg-violet-500", text: "text-violet-700", label: "IA / Tech" }
         };
 
-        // --- 5. RENDERIZADO (Vista) ---
+        const layoutGroups = {
+            executive: ["gerencia", "extranjero"],
+            boards: ["consejero_publica", "consejero_privada", "consejero_familiar", "consejero_fundacion"],
+            tech: ["energia", "finanzas", "legal", "ciberseguridad", "sostenibilidad", "banca", "inteligencia_artificial"]
+        };
+
+        // --- COMPONENT: DOT SYSTEM RENDERER ---
+
+        function renderDots(years, colorClass, isInteractive = false, skillKey = null, filterLevel = 0) {
+            const level = years > 0 ? Math.min(Math.ceil(years / 5), 6) : 0;
+            const activeLevel = isInteractive ? filterLevel : level;
+            
+            let html = '<div class="flex gap-1 w-full">';
+            for (let i = 1; i <= 6; i++) {
+                const isActive = i <= activeLevel;
+                let classes = "dot";
+                if (isActive) {
+                    classes += ` ${colorClass}`;
+                } else {
+                    classes += ` dot-inactive`;
+                }
+                
+                let clickAttribute = "";
+                if (isInteractive) {
+                    classes += " dot-interactive hover:brightness-90";
+                    const nextLevel = (filterLevel === i) ? 0 : i;
+                    clickAttribute = `onclick="setFilter('${skillKey}', ${nextLevel})"`;
+                    const minYearsLabel = (i-1)*5 + 1; 
+                    clickAttribute += ` title="Mínimo ${minYearsLabel} años"`;
+                }
+
+                html += `<div class="${classes}" ${clickAttribute}></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        // --- RENDER APP ---
+
+        function renderSearchFilters() {
+            const container = document.getElementById('search-filters-container');
+            let html = '';
+            const allKeys = [...layoutGroups.executive, ...layoutGroups.boards, ...layoutGroups.tech];
+            
+            allKeys.forEach(key => {
+                const conf = skillConfig[key];
+                const currentLevel = activeFilters[key] || 0;
+                const isActiveFilter = currentLevel > 0;
+                const opacityClass = isActiveFilter ? "opacity-100" : "opacity-70 hover:opacity-100";
+                
+                const dotsHtml = renderDots(0, conf.color, true, key, currentLevel);
+                
+                html += `
+                    <div class="flex flex-col gap-1 ${opacityClass} transition-opacity duration-200">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold ${conf.text} uppercase flex items-center gap-2">
+                                <i class="fa-solid ${conf.icon}"></i> ${conf.label}
+                            </span>
+                            <span class="font-mono text-[10px] text-slate-400 font-bold">
+                                ${currentLevel > 0 ? '>' + ((currentLevel-1)*5) + ' años' : ''}
+                            </span>
+                        </div>
+                        ${dotsHtml}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function setFilter(key, level) {
+            if (level === 0) {
+                delete activeFilters[key];
+            } else {
+                activeFilters[key] = level;
+            }
+            renderApp(); 
+        }
+
+        function renderSkillRow(keys, alumno) {
+            let html = '';
+            keys.forEach(key => {
+                const years = alumno.experiencia[key] ? calculateTotalYears(alumno.experiencia[key]) : 0;
+                const conf = skillConfig[key];
+                const dotsHtml = renderDots(years, conf.color, false);
+                const yearsText = years > 0 ? `${years}a` : '-';
+                const opacityClass = years > 0 ? '' : 'opacity-40 grayscale';
+
+                html += `
+                    <div class="mb-3 last:mb-0 ${opacityClass} group/skill hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-[10px] font-bold ${conf.text} flex items-center gap-1.5 truncate">
+                                <i class="fa-solid ${conf.icon} w-3 text-center"></i> ${conf.label}
+                            </span>
+                            <span class="text-[9px] font-mono font-bold text-slate-400">${yearsText}</span>
+                        </div>
+                        ${dotsHtml}
+                    </div>
+                `;
+            });
+            return html;
+        }
 
         function renderApp() {
+            renderSearchFilters();
+
             const container = document.getElementById('cards-container');
             const emptyState = document.getElementById('empty-state');
-            const resultCount = document.getElementById('results-count');
+            const resultsBar = document.getElementById('results-bar');
             
             container.innerHTML = '';
-
             const searchTerm = document.getElementById('searchName').value.toLowerCase();
-            const filterField = document.getElementById('filterField').value;
-            const minYears = parseInt(document.getElementById('minYears').value) || 0;
+            const filterField = document.getElementById('filterField').value; // Filtro select adicional
 
             let visibleCount = 0;
 
             alumnos.forEach(alumno => {
-                // Filtrado
+                // Filtro Texto
                 const nameMatch = alumno.nombre.toLowerCase().includes(searchTerm) || 
                                   alumno.cargos.some(c => c.toLowerCase().includes(searchTerm));
                 
                 if (!nameMatch) return;
                 
-                let yearsInFilter = 0;
+                // Filtro Select Adicional (si se usa)
                 if (filterField !== 'all') {
-                    if (!alumno.experiencia[filterField]) return; 
-                    yearsInFilter = calculateTotalYears(alumno.experiencia[filterField]);
-                    if (yearsInFilter < minYears) return;
-                } else {
-                    if (minYears > 0) {
-                        const maxExp = Object.values(alumno.experiencia).reduce((max, periods) => {
-                            return Math.max(max, calculateTotalYears(periods));
-                        }, 0);
-                        if (maxExp < minYears) return;
+                    const y = alumno.experiencia[filterField] ? calculateTotalYears(alumno.experiencia[filterField]) : 0;
+                    if (y === 0) return;
+                }
+
+                // Filtro Puntos
+                let passFilters = true;
+                for (const [key, reqLevel] of Object.entries(activeFilters)) {
+                    const years = alumno.experiencia[key] ? calculateTotalYears(alumno.experiencia[key]) : 0;
+                    const minYearsRequired = (reqLevel - 1) * 5 + 1; 
+                    if (years < minYearsRequired) {
+                        passFilters = false;
+                        break;
                     }
                 }
+                if (!passFilters) return;
 
                 visibleCount++;
 
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col h-full card-hover relative group";
+                const editBtn = isEditMode ? 
+                    `<button onclick="openEditModal(${alumno.id})" class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur text-blue-600 rounded-full shadow-sm hover:bg-blue-600 hover:text-white transition"><i class="fa-solid fa-pen text-xs"></i></button>` : '';
+
+                // Cargos con altura fija para 2 líneas
+                const rolesHtml = alumno.cargos.map(c => `<span class="block truncate text-xs font-medium text-slate-500">${c}</span>`).join('');
                 
-                const editBtnDisplay = isEditMode ? 'flex' : 'none';
-                
-                // Cargos
-                let rolesHtml = alumno.cargos.map(c => 
-                    `<span class="text-[10px] font-bold uppercase tracking-wide bg-slate-50 text-slate-600 px-2 py-1 rounded mr-1 mb-1 inline-block border border-slate-200 truncate max-w-full">${c}</span>`
-                ).join('');
-                
-                // Titulaciones
-                let titulosHtml = alumno.titulacion.map(t => {
-                    const style = getDegreeStyle(t);
-                    return `
-                        <div class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium mr-1 mb-1 border ${style.css} transition-colors">
-                            <i class="fa-solid ${style.icon} mr-1.5 opacity-80"></i>${t}
-                        </div>
-                    `;
+                const degreesHtml = alumno.titulacion.map(t => {
+                    const st = getDegreeStyle(t);
+                    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border ${st.css} mr-1 mb-1"><i class="fa-solid ${st.icon} opacity-70"></i> ${t}</span>`;
                 }).join('');
 
-                // --- Generación del Bloques de Skills por Grupos ---
-                let skillsHtml = '<div class="mt-auto space-y-3 pt-2">';
+                const executiveHtml = renderSkillRow(layoutGroups.executive, alumno);
+                const boardsHtml = renderSkillRow(layoutGroups.boards, alumno);
+                const techHtml = renderSkillRow(layoutGroups.tech, alumno);
+
+                const linkedinHtml = alumno.linkedin ? 
+                    `<a href="${alumno.linkedin}" target="_blank" class="text-blue-600 hover:text-blue-800 transition ml-2" title="Ver en LinkedIn"><i class="fab fa-linkedin text-lg"></i></a>` : '';
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group flex flex-col";
                 
-                skillGroups.forEach(group => {
-                    // Título de grupo
-                    skillsHtml += `
-                        <div>
-                            <div class="flex items-center space-x-2 mb-2">
-                                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">${group.title}</span>
-                                <div class="h-px bg-slate-100 flex-grow"></div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-x-3 gap-y-2">
-                    `;
-
-                    // Items del grupo
-                    group.keys.forEach(key => {
-                        const conf = skillConfig[key];
-                        const years = alumno.experiencia[key] ? calculateTotalYears(alumno.experiencia[key]) : 0;
-                        const hasExp = years > 0;
-                        const opacityClass = hasExp ? "opacity-100" : "opacity-30 grayscale";
-                        const yearText = hasExp ? `${years}a` : "-";
-                        const percent = Math.min((years / 25) * 100, 100); 
-
-                        skillsHtml += `
-                            <div class="flex flex-col group/skill ${opacityClass} transition-opacity duration-300">
-                                <div class="flex items-center justify-between text-[10px] mb-0.5">
-                                    <span class="font-bold ${conf.text} truncate pr-1 flex items-center" title="${conf.label}">
-                                        <i class="fa-solid ${conf.icon} mr-1 w-3 text-center"></i>${conf.label}
-                                    </span>
-                                    <span class="text-slate-500 font-mono text-[9px]">${yearText}</span>
-                                </div>
-                                <div class="exp-bar-bg bg-slate-100">
-                                    <div class="exp-bar-fill ${conf.color}" style="width: ${percent}%;"></div>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    skillsHtml += `</div></div>`; // Cierre grid y grupo
-                });
-                
-                skillsHtml += '</div>';
-
                 card.innerHTML = `
-                    <button onclick="openEditModal(${alumno.id})" style="display: ${editBtnDisplay}" class="absolute -top-3 -right-3 bg-white text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-100 shadow-md p-3 rounded-full transition-all z-10 w-10 h-10 items-center justify-center">
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
+                    ${editBtn}
+                    
+                    <!-- HEADER -->
+                    <div class="p-5 border-b border-slate-100">
+                        <div class="flex gap-4 items-start mb-3">
+                            <div class="relative shrink-0">
+                                <img src="${alumno.foto}" class="w-16 h-16 rounded-xl object-cover shadow-sm border border-slate-100 bg-slate-50">
+                                ${isEditMode ? `<div class="absolute -bottom-1 -right-1 bg-slate-800 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">ID:${alumno.id}</div>` : ''}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-lg text-slate-800 leading-tight truncate" title="${alumno.nombre}">${alumno.nombre}</h3>
+                                    ${linkedinHtml}
+                                </div>
+                                <!-- Contenedor de Cargos: Altura fija (approx 2.5rem para 2 líneas) -->
+                                <div class="text-xs space-y-0.5 h-10 overflow-hidden line-clamp-2">
+                                    ${rolesHtml}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FILA DE TÍTULOS (Debajo de Foto+Datos) -->
+                        <div class="flex flex-wrap mt-2 pt-2 border-t border-slate-50">
+                            ${degreesHtml}
+                        </div>
+                    </div>
 
-                    <div class="flex items-center space-x-4 mb-4">
-                        <div class="relative shrink-0">
-                            <img src="${alumno.foto}" alt="${alumno.nombre}" class="w-16 h-16 rounded-full border-2 border-white shadow-md object-cover bg-slate-100">
-                            ${isEditMode ? '<div class="absolute inset-0 bg-black bg-opacity-20 rounded-full flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition">ID:'+alumno.id+'</div>' : ''}
+                    <!-- BODY -->
+                    <div class="flex-grow flex flex-col md:flex-row text-sm">
+                        <!-- Columna Izq -->
+                        <div class="md:w-5/12 border-r border-slate-100 flex flex-col">
+                            <div class="p-4 border-b border-slate-100">
+                                <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-2">Dirección</div>
+                                ${executiveHtml}
+                            </div>
+                            <div class="p-4 bg-blue-50/50 flex-grow">
+                                <div class="text-[9px] font-bold uppercase tracking-wider text-blue-400 mb-2 flex items-center gap-1">
+                                    <i class="fa-solid fa-star text-[8px]"></i> Consejos
+                                </div>
+                                ${boardsHtml}
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-base text-slate-800 leading-tight truncate mb-1" title="${alumno.nombre}">${alumno.nombre}</h3>
-                            <div class="flex flex-wrap">${rolesHtml}</div>
+                        <!-- Columna Der -->
+                        <div class="md:w-7/12 p-4 bg-slate-50/30">
+                            <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-2">Áreas de Expertise</div>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                ${techHtml}
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mb-3 flex flex-wrap min-h-[2.5rem] content-start">
-                        ${titulosHtml}
-                    </div>
-                    
-                    ${skillsHtml}
                 `;
-
                 container.appendChild(card);
             });
 
-            resultCount.textContent = `${visibleCount} candidato${visibleCount !== 1 ? 's' : ''}`;
+            resultsBar.textContent = `MOSTRANDO ${visibleCount} CANDIDATO${visibleCount !== 1 ? 'S' : ''}`;
+            
             if (visibleCount === 0) {
-                container.classList.add('hidden');
                 emptyState.classList.remove('hidden');
+                container.classList.add('hidden');
             } else {
-                container.classList.remove('hidden');
                 emptyState.classList.add('hidden');
+                container.classList.remove('hidden');
             }
+        }
+
+        // --- UI UTILS ---
+        
+        // ... (Funciones de toggle, reset, modals igual que antes)
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('btn-mode');
+            const actions = document.getElementById('file-actions');
+            if (isEditMode) {
+                btn.classList.add('bg-blue-600', 'text-white', 'border-transparent');
+                btn.classList.remove('bg-slate-800', 'border-slate-700');
+                btn.innerHTML = '<i class="fa-solid fa-eye mr-2"></i> Ver Fichas';
+                actions.classList.remove('hidden');
+            } else {
+                btn.classList.remove('bg-blue-600', 'text-white', 'border-transparent');
+                btn.classList.add('bg-slate-800', 'border-slate-700');
+                btn.innerHTML = '<i class="fa-solid fa-pen-to-square mr-2"></i> Modo Edición';
+                actions.classList.add('hidden');
+            }
+            renderApp();
         }
 
         function resetFilters() {
             document.getElementById('searchName').value = '';
             document.getElementById('filterField').value = 'all';
-            document.getElementById('minYears').value = 0;
-            renderApp();
-        }
-
-        // --- 6. GESTIÓN DE EDICIÓN Y ARCHIVOS ---
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const btn = document.getElementById('btn-mode');
-            const fileActions = document.getElementById('file-actions');
-            
-            if (isEditMode) {
-                btn.innerHTML = '<i class="fa-solid fa-eye mr-2"></i> Modo Visor';
-                btn.classList.remove('bg-blue-800', 'border-blue-700');
-                btn.classList.add('bg-slate-700', 'border-slate-600', 'hover:bg-slate-600');
-                fileActions.classList.remove('hidden');
-                showNotification("Modo Edición activado", "info");
-            } else {
-                btn.innerHTML = '<i class="fa-solid fa-pen-to-square mr-2"></i> Modo Edición';
-                btn.classList.add('bg-blue-800', 'border-blue-700');
-                btn.classList.remove('bg-slate-700', 'border-slate-600', 'hover:bg-slate-600');
-                fileActions.classList.add('hidden');
-            }
+            activeFilters = {}; 
             renderApp();
         }
 
@@ -544,11 +615,13 @@
 
             document.getElementById('edit-id').value = alumno.id;
             document.getElementById('edit-nombre').value = alumno.nombre;
-            document.getElementById('edit-foto').value = alumno.foto;
+            document.getElementById('edit-linkedin').value = alumno.linkedin || "";
             document.getElementById('edit-cargos').value = alumno.cargos.join(', ');
+            document.getElementById('edit-foto').value = alumno.foto;
+            document.getElementById('preview-foto').src = alumno.foto;
             document.getElementById('edit-titulacion').value = alumno.titulacion.join(', ');
             document.getElementById('edit-experiencia').value = JSON.stringify(alumno.experiencia, null, 4);
-            
+
             const modal = document.getElementById('edit-modal');
             const content = document.getElementById('modal-content');
             modal.classList.remove('hidden');
@@ -562,58 +635,47 @@
         function closeModal() {
             const modal = document.getElementById('edit-modal');
             const content = document.getElementById('modal-content');
-            
             content.classList.remove('scale-100', 'opacity-100');
             content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
         }
 
         function saveEdits() {
             const id = parseInt(document.getElementById('edit-id').value);
-            const nombre = document.getElementById('edit-nombre').value;
-            const foto = document.getElementById('edit-foto').value;
-            const cargos = document.getElementById('edit-cargos').value.split(',').map(s => s.trim()).filter(s => s);
-            const titulacion = document.getElementById('edit-titulacion').value.split(',').map(s => s.trim()).filter(s => s);
-            
             try {
                 const experiencia = JSON.parse(document.getElementById('edit-experiencia').value);
-                
                 const index = alumnos.findIndex(a => a.id === id);
                 if (index !== -1) {
-                    alumnos[index] = { ...alumnos[index], nombre, foto, cargos, titulacion, experiencia };
-                    
+                    alumnos[index] = {
+                        ...alumnos[index],
+                        nombre: document.getElementById('edit-nombre').value,
+                        linkedin: document.getElementById('edit-linkedin').value,
+                        foto: document.getElementById('edit-foto').value,
+                        cargos: document.getElementById('edit-cargos').value.split(',').map(s=>s.trim()).filter(s=>s),
+                        titulacion: document.getElementById('edit-titulacion').value.split(',').map(s=>s.trim()).filter(s=>s),
+                        experiencia
+                    };
                     closeModal();
                     renderApp();
-                    showNotification("Cambios aplicados correctamente", "success");
+                    showNotification("Cambios guardados correctamente", "success");
                 }
             } catch (e) {
-                showNotification("Error: JSON de experiencia inválido", "error");
+                showNotification("Error: Formato JSON inválido", "error");
             }
         }
 
         function exportData() {
-            const dataStr = JSON.stringify(alumnos, null, 2);
-            const blob = new Blob([dataStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(alumnos, null, 2));
             const a = document.createElement('a');
-            a.href = url;
+            a.href = dataStr;
             a.download = `consejeros_coiim_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification("Archivo JSON generado", "success");
+            showNotification("Datos exportados", "success");
         }
 
-        function importData(inputElement) {
-            const file = inputElement.files[0];
+        function importData(input) {
+            const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -621,49 +683,30 @@
                     if (Array.isArray(json)) {
                         alumnos = json;
                         renderApp();
-                        showNotification("Base de datos actualizada", "success");
-                    } else {
-                        showNotification("El archivo no tiene el formato correcto", "error");
+                        showNotification("Datos importados con éxito", "success");
                     }
-                } catch (error) {
-                    showNotification("Error al leer el archivo JSON", "error");
-                }
-                inputElement.value = '';
+                } catch(e) { showNotification("Error al importar archivo", "error"); }
+                input.value = '';
             };
             reader.readAsText(file);
         }
-        
-        function showNotification(message, type = 'info') {
+
+        function showNotification(msg, type) {
             const container = document.getElementById('notification-container');
-            const notif = document.createElement('div');
-            
-            let bgClass, icon;
-            if (type === 'success') {
-                bgClass = 'bg-green-600';
-                icon = 'fa-check-circle';
-            } else if (type === 'error') {
-                bgClass = 'bg-red-600';
-                icon = 'fa-circle-exclamation';
-            } else {
-                bgClass = 'bg-blue-600';
-                icon = 'fa-circle-info';
-            }
-
-            notif.className = `${bgClass} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 notification transform transition-all duration-300`;
-            notif.innerHTML = `
-                <i class="fa-solid ${icon}"></i>
-                <span class="font-medium text-sm">${message}</span>
-            `;
-
-            container.appendChild(notif);
-
+            const div = document.createElement('div');
+            const colors = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            const icon = type === 'success' ? 'fa-check' : type === 'error' ? 'fa-exclamation' : 'fa-info';
+            div.className = `${colors} text-white px-4 py-3 rounded-xl shadow-lg shadow-slate-300 flex items-center gap-3 text-sm font-bold notification pointer-events-auto min-w-[300px]`;
+            div.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
+            container.appendChild(div);
             setTimeout(() => {
-                notif.style.opacity = '0';
-                notif.style.transform = 'translateY(10px)';
-                setTimeout(() => notif.remove(), 300);
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(10px)';
+                setTimeout(() => div.remove(), 300);
             }, 3000);
         }
 
+        // Inicializar
         renderApp();
 
     </script>
