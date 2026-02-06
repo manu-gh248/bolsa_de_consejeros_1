@@ -100,19 +100,30 @@
                 </div>
                 
                 <div class="md:col-span-4">
-                    <label class="block text-xs font-medium text-slate-500 mb-1">Experiencia Sectorial</label>
+                    <label class="block text-xs font-medium text-slate-500 mb-1">Filtro Avanzado</label>
                     <select id="filterField" class="border border-slate-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white transition" onchange="renderApp()">
                         <option value="all">Todas las especialidades</option>
-                        <option value="energia">Energía</option>
-                        <option value="finanzas">Finanzas</option>
-                        <option value="banca">Banca</option>
-                        <option value="inteligencia_artificial">Inteligencia Artificial</option>
-                        <option value="ciberseguridad">Ciberseguridad</option>
-                        <option value="sostenibilidad">Sostenibilidad (ESG)</option>
-                        <option value="consejero_publica">Empresa Pública</option>
-                        <option value="consejero_privada">Empresa Privada</option>
-                        <option value="gerencia">Alta Gerencia</option>
-                        <option value="extranjero">Exp. Internacional</option>
+                        
+                        <optgroup label="Experiencia Laboral">
+                            <option value="gerencia">Alta Gerencia</option>
+                            <option value="extranjero">Exp. Internacional</option>
+                        </optgroup>
+                        
+                        <optgroup label="Consejos de Administración">
+                            <option value="consejero_publica">Empresa Pública</option>
+                            <option value="consejero_privada">Empresa Privada</option>
+                            <option value="consejero_familiar">Empresa Familiar</option>
+                        </optgroup>
+                        
+                        <optgroup label="Áreas de Expertise">
+                            <option value="inteligencia_artificial">IA / Tech</option>
+                            <option value="finanzas">Finanzas</option>
+                            <option value="legal">Legal / Regulatorio</option>
+                            <option value="ciberseguridad">Ciberseguridad</option>
+                            <option value="sostenibilidad">Sostenibilidad (ESG)</option>
+                            <option value="energia">Energía</option>
+                            <option value="banca">Banca</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -230,7 +241,8 @@
                     "energia": [{ inicio: 2005, fin: 2015 }, { inicio: 2018, fin: null }],
                     "finanzas": [{ inicio: 2010, fin: 2015 }],
                     "sostenibilidad": [{ inicio: 2015, fin: null }],
-                    "consejero_publica": [{ inicio: 2020, fin: null }]
+                    "consejero_publica": [{ inicio: 2020, fin: null }],
+                    "consejero_privada": [{ inicio: 2018, fin: null }]
                 }
             },
             {
@@ -258,7 +270,8 @@
                     "extranjero": [{ inicio: 1998, fin: 2010 }],
                     "gerencia": [{ inicio: 2005, fin: null }],
                     "consejero_privada": [{ inicio: 2015, fin: null }],
-                    "energia": [{ inicio: 2020, fin: null }]
+                    "consejero_familiar": [{ inicio: 2010, fin: 2015 }],
+                    "legal": [{ inicio: 2000, fin: 2005 }]
                 }
             },
             {
@@ -272,7 +285,8 @@
                     "finanzas": [{ inicio: 1995, fin: null }],
                     "banca": [{ inicio: 2000, fin: 2010 }],
                     "extranjero": [{ inicio: 2010, fin: 2018 }],
-                    "gerencia": [{ inicio: 2018, fin: null }]
+                    "gerencia": [{ inicio: 2018, fin: null }],
+                    "consejero_familiar": [{ inicio: 2020, fin: null }]
                 }
             }
         ];
@@ -299,66 +313,63 @@
             return Math.floor(totalDays / 365);
         }
 
-        // --- 3. ESTILOS DE TITULACIONES (Nuevo) ---
+        // --- 3. ESTILOS DE TITULACIONES ---
         
         function getDegreeStyle(title) {
             const t = title.toLowerCase();
             
-            // Ingeniería y Técnico
             if (t.includes('ingenier') || t.includes('telecom') || t.includes('caminos') || t.includes('industrial') || t.includes('informát')) {
-                return { 
-                    icon: "fa-gears", 
-                    css: "bg-blue-50 text-blue-700 border-blue-200" 
-                };
+                return { icon: "fa-gears", css: "bg-blue-50 text-blue-700 border-blue-200" };
             }
-            // Negocio y Dirección
             if (t.includes('mba') || t.includes('ade') || t.includes('business') || t.includes('pade') || t.includes('dirección')) {
-                return { 
-                    icon: "fa-user-tie", 
-                    css: "bg-emerald-50 text-emerald-700 border-emerald-200" 
-                };
+                return { icon: "fa-user-tie", css: "bg-emerald-50 text-emerald-700 border-emerald-200" };
             }
-            // Economía y Finanzas
             if (t.includes('econom') || t.includes('financ') || t.includes('cfa')) {
-                return { 
-                    icon: "fa-chart-pie", 
-                    css: "bg-amber-50 text-amber-700 border-amber-200" 
-                };
+                return { icon: "fa-chart-pie", css: "bg-amber-50 text-amber-700 border-amber-200" };
             }
-            // Derecho y Legal
             if (t.includes('derecho') || t.includes('leyes') || t.includes('jurídic') || t.includes('abogad')) {
-                return { 
-                    icon: "fa-scale-balanced", 
-                    css: "bg-red-50 text-red-700 border-red-200" 
-                };
+                return { icon: "fa-scale-balanced", css: "bg-red-50 text-red-700 border-red-200" };
             }
-            // Doctorados y Ciencias
             if (t.includes('phd') || t.includes('doctor') || t.includes('ciencias') || t.includes('física')) {
-                return { 
-                    icon: "fa-microscope", 
-                    css: "bg-violet-50 text-violet-700 border-violet-200" 
-                };
+                return { icon: "fa-microscope", css: "bg-violet-50 text-violet-700 border-violet-200" };
             }
-            
-            // Default
-            return { 
-                icon: "fa-graduation-cap", 
-                css: "bg-slate-50 text-slate-600 border-slate-200" 
-            };
+            return { icon: "fa-graduation-cap", css: "bg-slate-50 text-slate-600 border-slate-200" };
         }
 
         // --- 4. CONFIGURACIÓN VISUAL SKILLS ---
+        
+        // Estructura de Grupos para renderizado
+        const skillGroups = [
+            {
+                title: "Experiencia Laboral",
+                keys: ["gerencia", "extranjero"]
+            },
+            {
+                title: "Experiencia en Consejos",
+                keys: ["consejero_publica", "consejero_privada", "consejero_familiar"]
+            },
+            {
+                title: "Áreas de Expertise",
+                keys: ["inteligencia_artificial", "finanzas", "legal", "ciberseguridad", "sostenibilidad", "energia", "banca"]
+            }
+        ];
+
+        // Diccionario visual de skills (Añadido 'legal' y 'consejero_familiar')
         const skillConfig = {
             "gerencia": { icon: "fa-briefcase", color: "bg-blue-800", text: "text-blue-800", label: "Alta Gerencia" },
+            "extranjero": { icon: "fa-globe", color: "bg-cyan-500", text: "text-cyan-700", label: "Exp. Internac." },
+            
             "consejero_publica": { icon: "fa-landmark", color: "bg-orange-600", text: "text-orange-700", label: "Cons. Público" },
             "consejero_privada": { icon: "fa-building", color: "bg-indigo-600", text: "text-indigo-700", label: "Cons. Privado" },
-            "energia": { icon: "fa-bolt", color: "bg-amber-500", text: "text-amber-700", label: "Energía" },
-            "finanzas": { icon: "fa-chart-line", color: "bg-emerald-600", text: "text-emerald-700", label: "Finanzas" },
-            "banca": { icon: "fa-building-columns", color: "bg-slate-600", text: "text-slate-700", label: "Banca" },
+            "consejero_familiar": { icon: "fa-people-roof", color: "bg-rose-500", text: "text-rose-700", label: "Cons. Familiar" },
+            
             "inteligencia_artificial": { icon: "fa-brain", color: "bg-violet-600", text: "text-violet-700", label: "IA / Tech" },
+            "finanzas": { icon: "fa-chart-line", color: "bg-emerald-600", text: "text-emerald-700", label: "Finanzas" },
+            "legal": { icon: "fa-scale-balanced", color: "bg-stone-600", text: "text-stone-700", label: "Legal" },
             "ciberseguridad": { icon: "fa-shield-halved", color: "bg-red-600", text: "text-red-700", label: "Ciberseguridad" },
             "sostenibilidad": { icon: "fa-leaf", color: "bg-lime-500", text: "text-lime-700", label: "ESG" },
-            "extranjero": { icon: "fa-globe", color: "bg-cyan-500", text: "text-cyan-700", label: "Exp. Internac." }
+            "energia": { icon: "fa-bolt", color: "bg-amber-500", text: "text-amber-700", label: "Energía" },
+            "banca": { icon: "fa-building-columns", color: "bg-slate-600", text: "text-slate-700", label: "Banca" }
         };
 
         // --- 5. RENDERIZADO (Vista) ---
@@ -409,7 +420,7 @@
                     `<span class="text-[10px] font-bold uppercase tracking-wide bg-slate-50 text-slate-600 px-2 py-1 rounded mr-1 mb-1 inline-block border border-slate-200 truncate max-w-full">${c}</span>`
                 ).join('');
                 
-                // Titulaciones con estilo dinámico
+                // Titulaciones
                 let titulosHtml = alumno.titulacion.map(t => {
                     const style = getDegreeStyle(t);
                     return `
@@ -419,30 +430,47 @@
                     `;
                 }).join('');
 
-                // Skills
-                let skillsHtml = '<div class="grid grid-cols-2 gap-x-3 gap-y-2 mt-auto pt-3 border-t border-slate-100">';
-                Object.keys(skillConfig).forEach(key => {
-                    const conf = skillConfig[key];
-                    const years = alumno.experiencia[key] ? calculateTotalYears(alumno.experiencia[key]) : 0;
-                    const hasExp = years > 0;
-                    const opacityClass = hasExp ? "opacity-100" : "opacity-30 grayscale";
-                    const yearText = hasExp ? `${years}a` : "-";
-                    const percent = Math.min((years / 25) * 100, 100); 
-
+                // --- Generación del Bloques de Skills por Grupos ---
+                let skillsHtml = '<div class="mt-auto space-y-3 pt-2">';
+                
+                skillGroups.forEach(group => {
+                    // Título de grupo
                     skillsHtml += `
-                        <div class="flex flex-col group/skill ${opacityClass} transition-opacity duration-300">
-                            <div class="flex items-center justify-between text-[10px] mb-0.5">
-                                <span class="font-bold ${conf.text} truncate pr-1 flex items-center" title="${conf.label}">
-                                    <i class="fa-solid ${conf.icon} mr-1 w-3 text-center"></i>${conf.label}
-                                </span>
-                                <span class="text-slate-500 font-mono text-[9px]">${yearText}</span>
+                        <div>
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">${group.title}</span>
+                                <div class="h-px bg-slate-100 flex-grow"></div>
                             </div>
-                            <div class="exp-bar-bg bg-slate-100">
-                                <div class="exp-bar-fill ${conf.color}" style="width: ${percent}%;"></div>
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                     `;
+
+                    // Items del grupo
+                    group.keys.forEach(key => {
+                        const conf = skillConfig[key];
+                        const years = alumno.experiencia[key] ? calculateTotalYears(alumno.experiencia[key]) : 0;
+                        const hasExp = years > 0;
+                        const opacityClass = hasExp ? "opacity-100" : "opacity-30 grayscale";
+                        const yearText = hasExp ? `${years}a` : "-";
+                        const percent = Math.min((years / 25) * 100, 100); 
+
+                        skillsHtml += `
+                            <div class="flex flex-col group/skill ${opacityClass} transition-opacity duration-300">
+                                <div class="flex items-center justify-between text-[10px] mb-0.5">
+                                    <span class="font-bold ${conf.text} truncate pr-1 flex items-center" title="${conf.label}">
+                                        <i class="fa-solid ${conf.icon} mr-1 w-3 text-center"></i>${conf.label}
+                                    </span>
+                                    <span class="text-slate-500 font-mono text-[9px]">${yearText}</span>
+                                </div>
+                                <div class="exp-bar-bg bg-slate-100">
+                                    <div class="exp-bar-fill ${conf.color}" style="width: ${percent}%;"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    skillsHtml += `</div></div>`; // Cierre grid y grupo
                 });
+                
                 skillsHtml += '</div>';
 
                 card.innerHTML = `
