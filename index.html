@@ -713,7 +713,15 @@
             document.getElementById('edit-foto').value = alumno.foto;
             document.getElementById('preview-foto').src = alumno.foto;
             document.getElementById('edit-titulacion').value = alumno.titulacion.join(', ');
-            document.getElementById('edit-experiencia').value = JSON.stringify(alumno.experiencia, null, 4);
+            
+            // Generar objeto completo con todas las claves para facilitar edición
+            const allKeys = Object.keys(skillConfig);
+            const fullExperience = {};
+            allKeys.forEach(key => {
+                fullExperience[key] = alumno.experiencia[key] || [];
+            });
+            
+            document.getElementById('edit-experiencia').value = JSON.stringify(fullExperience, null, 4);
 
             const modal = document.getElementById('edit-modal');
             const content = document.getElementById('modal-content');
