@@ -259,7 +259,6 @@
                 cargos: ["CTO Banco Futuro", "Patrón Fundación Innovación"],
                 experiencia: {
                     "gerencia": [{ inicio: 2015, fin: null }],
-                    "banca": [{ inicio: 2010, fin: null }],
                     "inteligencia_artificial": [{ inicio: 2000, fin: 2010 }, { inicio: 2015, fin: null }],
                     "ciberseguridad": [{ inicio: 2018, fin: null }],
                     "consejero_fundacion": [{ inicio: 2019, fin: null }]
@@ -290,7 +289,6 @@
                 experiencia: {
                     "gerencia": [{ inicio: 2018, fin: null }],
                     "finanzas": [{ inicio: 1995, fin: null }],
-                    "banca": [{ inicio: 2000, fin: 2010 }],
                     "extranjero": [{ inicio: 2010, fin: 2018 }],
                     "consejero_familiar": [{ inicio: 2020, fin: null }]
                 }
@@ -332,7 +330,6 @@
                 cargos: ["CISO Global Bank", "Consejera Indep. TechCorp"],
                 experiencia: {
                     "ciberseguridad": [{ inicio: 2008, fin: null }],
-                    "banca": [{ inicio: 2012, fin: null }],
                     "inteligencia_artificial": [{ inicio: 2018, fin: null }],
                     "consejero_privada": [{ inicio: 2021, fin: null }]
                 }
@@ -403,8 +400,7 @@
                 experiencia: {
                     "inteligencia_artificial": [{ inicio: 2010, fin: null }],
                     "ciberseguridad": [{ inicio: 2015, fin: null }],
-                    "gerencia": [{ inicio: 2018, fin: null }],
-                    "banca": [{ inicio: 2012, fin: 2018 }]
+                    "gerencia": [{ inicio: 2018, fin: null }]
                 }
             }
         ];
@@ -454,14 +450,13 @@
             "legal": { icon: "fa-scale-balanced", color: "bg-stone-500", text: "text-stone-700", label: "Legal" },
             "ciberseguridad": { icon: "fa-shield-halved", color: "bg-red-500", text: "text-red-700", label: "Ciberseg." },
             "sostenibilidad": { icon: "fa-leaf", color: "bg-lime-500", text: "text-lime-700", label: "ESG" },
-            "banca": { icon: "fa-building-columns", color: "bg-blue-400", text: "text-blue-600", label: "Banca" },
             "inteligencia_artificial": { icon: "fa-brain", color: "bg-violet-500", text: "text-violet-700", label: "IA / Tech" }
         };
 
         const layoutGroups = {
             executive: ["gerencia", "extranjero"],
             boards: ["consejero_publica", "consejero_privada", "consejero_familiar", "consejero_fundacion"],
-            tech: ["energia", "finanzas", "legal", "ciberseguridad", "sostenibilidad", "banca", "inteligencia_artificial"]
+            tech: ["energia", "finanzas", "legal", "ciberseguridad", "sostenibilidad", "inteligencia_artificial"]
         };
 
         // --- COMPONENT: DOT SYSTEM RENDERER ---
@@ -660,7 +655,7 @@
                         <!-- Columna Der -->
                         <div class="md:w-7/12 p-4 bg-slate-50/30">
                             <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-2">Áreas de Expertise</div>
-                            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                            <div class="flex flex-col gap-y-2">
                                 ${techHtml}
                             </div>
                         </div>
